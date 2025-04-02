@@ -1,0 +1,52 @@
+<% layout('/layouts/boilerplate') -%>
+
+<div class="container my-4">
+  <h2>Checkout</h2>
+
+  <!-- Delivery Information Form -->
+  <!-- This form requires name, address, phone before proceeding -->
+  <form action="/cart/checkout" method="POST">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name:</label>
+      <input 
+        type="text" 
+        name="name" 
+        id="name" 
+        class="form-control" 
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="address" class="form-label">Address:</label>
+      <input 
+        type="text" 
+        name="address" 
+        id="address" 
+        class="form-control" 
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="phone" class="form-label">Phone Number:</label>
+      <input 
+        type="text" 
+        name="phone" 
+        id="phone" 
+        class="form-control" 
+        required
+      />
+    </div>
+
+    <!-- Order Summary (only Subtotal and Delivery Price) -->
+    <h4>Order Summary</h4>
+    <p>Subtotal: $<%= subtotal.toLocaleString("en-US") %></p>
+    <p>Delivery Price: $<%= deliveryCharge.toLocaleString("en-US") %></p>
+
+    <!-- Button to proceed with Cash on Delivery -->
+    <button type="submit" class="btn btn-dark mt-3">
+      Proceed to C.O.D.
+    </button>
+  </form>
+</div>

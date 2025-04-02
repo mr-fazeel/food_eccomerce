@@ -1,0 +1,84 @@
+body {
+    font-family: "Plus Jakarta Sans", sans-serif !important;
+    font-optical-sizing: auto !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    /* expand and fill any remaining vertical space within the body flex container */
+    flex: 1;
+}
+
+.navbar {
+    height: 5rem;
+    background-color: white;
+}
+
+.br-name {
+    color: #fc5e25 !important;
+    font-weight: 900;
+    font-size: 2rem;
+}
+
+.fa-shopping-basket,
+.fa-magnifying-glass {
+    color: #4A5572;
+    font-size: 1.6rem;
+    /* Adjust size as needed */
+}
+
+.navbar-nav-center {
+    flex: 1;
+    /* Allow this div to grow and take up space */
+    display: flex;
+    justify-content: center;
+    /* Center align the items */
+    gap: 0.4rem;
+}
+
+.text-orange {
+    color: #fc5e25;
+}
+
+.footer hr {
+    opacity: 0.2;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* Index main image */
+
+.card img {
+    height: 34rem;
+    border: none !important;
+    border-radius: 3rem;
+
+}
+
+.card {
+
+    border: none !important;
+    border-radius: 3rem;
+
+}
+
+.main-img-card-title {
+    margin-top: 11.5rem;
+    font-size: 3.9rem;
+    font-weight: 700;
+}
+
+.card-text {
+    width: 41.6rem;
+    font-size: 0.9rem;
+}
+
+

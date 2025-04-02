@@ -1,0 +1,53 @@
+<% layout('/layouts/boilerplate') -%>
+
+  <div class="container d-flex justify-content-center align-items-center my-4">
+    <div class="card text-bg-dark w-100">
+      <img
+        src="https://static.vecteezy.com/system/resources/previews/050/679/260/non_2x/fresh-vegetables-and-fruits-arranged-on-a-vibrant-orange-backdrop-creating-a-colorful-culinary-display-in-a-kitchen-setting-photo.jpg"
+        class="card-img img-fluid" alt="Fruits and Vegetables">
+      <div class="card-img-overlay">
+        <h5 class="card-title main-img-card-title ms-5">Order Your <br> Favourite Food Here</h5>
+        <p class="card-text mt-4 ms-5">Choose from a diverse menu featuring a delectable array of dishes crafted
+          with the finest ingredients and culinary expertise. Our mission is to satisfy your cravings and
+          elevate your dining experience, one delicious meal at a time.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>Top dishes for you!</h3>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mt-3">
+    <% for (const item of allItems) { %>
+      <div class="col">
+        <div class="card h-100" style="width: 300px;">
+          <div style="width: 300px; height: 300px;">
+            <img src="<%= item.image.url %>" class="card-img-top" alt="Listing-image" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="card-body">
+            <p class="card-text">
+              <b style="font-size: 1.2rem;">
+                <%= item.title %>
+              </b>
+            </p>
+            <p style="font-size: 0.9rem !important;">
+              <%= item.description %>
+            </p>
+            <p class="card-text">
+              <b style="color: #fc5e25;">
+                &dollar;<%= item.price.toLocaleString("en-US") %>
+              </b>
+            </p>
+          </div>
+          <!-- Add to Cart Form -->
+          <form action="/cart/<%= item._id %>" method="POST">
+            <button type="submit"
+              class="btn bg-dark text-bg-dark <%= userCart.some(cartItem => cartItem.itemId.equals(item._id)) ? 'btn-success' : 'btn-warning' %>">
+              <%= userCart.some(cartItem=> cartItem.itemId.equals(item._id)) ? 'Added to cart' : 'Add to cart' %>
+            </button>
+          </form>
+        </div>
+      </div>
+      <% } %>
+  </div>
