@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -6,6 +7,7 @@ const ejsMate = require('ejs-mate');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const Item = require('./models/items');
@@ -16,7 +18,8 @@ const ExpressError = require('./utils/ExpressError.js');
 const { saveRedirectUrl } = require('./middleware');
 const { isLoggedIn } = require('./middleware');
 
-const MONGO_URL = 'mongodb://127.0.0.1:27017/food';
+// MongoDB Connection
+const dbUrl = process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017/food';
 
 // Connect to MongoDB
 main()
@@ -24,7 +27,7 @@ main()
     .catch((err) => console.log(err));
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(dbUrl);
 }
 
 // Middleware & Configurations
@@ -37,16 +40,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride("_method"));
 
 // Session Configuration
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60, // time period in seconds
+    crypto: {
+        secret: process.env.SESSION_SECRET
+    }
+});
+
 const sessionOptions = {
-    secret: 'process.env.SECRET',
+    store,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
     },
 };
+
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -62,6 +76,15 @@ app.use((req, res, next) => {
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     res.locals.currUser = req.user;
+    next();
+});
+
+// Security Headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     next();
 });
 
@@ -389,8 +412,22 @@ app.post('/admin/orders/update', async (req, res) => {
 app.all('*', (req, res, next) => next(new ExpressError(404, 'Page Not Found')));
 app.use((err, req, res, next) => {
     const { statusCode = 500, message = 'Something went wrong!' } = err;
-    res.status(statusCode).render('foods/error', { message });
+    if (process.env.NODE_ENV === 'production') {
+        // Don't expose error details in production
+        res.status(statusCode).render('error', { 
+            message: statusCode === 500 ? 'Internal Server Error' : message 
+        });
+    } else {
+        // Show detailed errors in development
+        res.status(statusCode).render('error', { 
+            message,
+            stack: err.stack 
+        });
+    }
 });
 
-// Start Server
-app.listen(8080, () => console.log('Server running on http://localhost:8080'));
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
+});
